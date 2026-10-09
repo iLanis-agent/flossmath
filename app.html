@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Floss math - the app</title>
+<style>
+  :root { --ink:#33242c; --bg:#f7f3f4; --card:#fff; --accent:#7a3b57; --accent2:#935071; --soft:#f0dee7; }
+  * { box-sizing:border-box; margin:0; }
+  body { font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--ink); padding:18px; }
+  .wrap { max-width:1180px; margin:0 auto; }
+  .lede { text-align:center; color:#6b5560; margin:6px 0 16px; font-size:15px; max-width:760px; margin-left:auto; margin-right:auto; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:18px; }
+  .card { background:var(--card); border-radius:14px; padding:22px; box-shadow:0 1px 3px rgba(80,40,60,.08); }
+  h2 { font-size:19px; margin-bottom:14px; }
+  label { display:block; font-size:13px; color:#75626c; margin:10px 0 4px; }
+  input { width:100%; padding:9px 10px; border:1px solid #d8c7cf; border-radius:8px; font-size:15px; background:#fdfbfc; }
+  button { width:100%; margin-top:16px; padding:12px; border:0; border-radius:9px; background:var(--accent); color:#fff; font-size:15px; font-weight:600; cursor:pointer; }
+  button:hover { background:var(--accent2); }
+  .big { font-size:34px; font-weight:700; margin:14px 0 2px; }
+  .cap { font-size:13px; color:#75626c; }
+  .pill { display:inline-block; margin-top:10px; padding:5px 12px; border-radius:20px; font-size:13px; font-weight:600; }
+  .pill.warm { background:var(--soft); color:var(--accent); }
+  table { width:100%; margin-top:12px; border-collapse:collapse; font-size:14px; }
+  td { padding:7px 0; border-bottom:1px solid #e8dce2; }
+  td:last-child { text-align:right; font-weight:600; }
+  .err { color:#a3341f; font-size:14px; margin-top:10px; }
+  .foot { margin-top:20px; font-size:12.5px; color:#82707a; line-height:1.6; }
+  .foot a { color:var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="lede">The pattern says 100 by 80 stitches, the fabric says 14 count, and nobody says how big the finished piece actually is. Divide once, before you cut.</p>
+  <div class="cards">
+    <div class="card">
+      <h2>Finished size</h2>
+      <label for="s_w">Design width (stitches)</label>
+      <input id="s_w" type="number" value="100" min="0" step="1">
+      <label for="s_h">Design height (stitches)</label>
+      <input id="s_h" type="number" value="80" min="0" step="1">
+      <label for="s_c">Fabric count (stitches per inch)</label>
+      <input id="s_c" type="number" value="14" min="0" step="1">
+      <label for="s_m">Margin per side for framing (inches)</label>
+      <input id="s_m" type="number" value="3" min="0" step="0.5">
+      <button id="s_go">Size the piece</button>
+      <div class="big" id="s_out">-</div>
+      <div class="cap">finished size (inches)</div>
+      <div class="pill warm" id="s_verdict" style="display:none"></div>
+      <table id="s_rows" style="display:none">
+        <tr><td>finished size (cm)</td><td id="s_cm">-</td></tr>
+        <tr><td>fabric to cut (inches)</td><td id="s_cut">-</td></tr>
+      </table>
+      <div class="err" id="s_err"></div>
+    </div>
+    <div class="card">
+      <h2>Floss skeins</h2>
+      <label for="f_n">Total stitches in one color</label>
+      <input id="f_n" type="number" value="5000" min="0" step="100">
+      <label for="f_cm">Floss per stitch (cm - 1.4 is a labeled norm)</label>
+      <input id="f_cm" type="number" value="1.4" min="0" step="0.1">
+      <label for="f_m">Skein length (meters)</label>
+      <input id="f_m" type="number" value="8" min="0" step="0.5">
+      <label for="f_ss">Strands in the skein</label>
+      <input id="f_ss" type="number" value="6" min="0" step="1">
+      <label for="f_u">Strands you stitch with</label>
+      <input id="f_u" type="number" value="2" min="0" step="1">
+      <button id="f_go">Count the skeins</button>
+      <div class="big" id="f_out">-</div>
+      <div class="cap">skeins to buy</div>
+      <div class="pill warm" id="f_verdict" style="display:none"></div>
+      <table id="f_rows" style="display:none">
+        <tr><td>stitching thread per skein</td><td id="f_thread">-</td></tr>
+        <tr><td>thread you will use</td><td id="f_need">-</td></tr>
+      </table>
+      <div class="err" id="f_err"></div>
+    </div>
+    <div class="card">
+      <h2>Grid lines</h2>
+      <label for="g_w">Design width (stitches)</label>
+      <input id="g_w" type="number" value="100" min="0" step="1">
+      <label for="g_h">Design height (stitches)</label>
+      <input id="g_h" type="number" value="80" min="0" step="1">
+      <label for="g_n">Grid every N stitches</label>
+      <input id="g_n" type="number" value="10" min="0" step="1">
+      <button id="g_go">Count the grid</button>
+      <div class="big" id="g_out">-</div>
+      <div class="cap">grid lines to mark</div>
+      <table id="g_rows" style="display:none">
+        <tr><td>vertical lines</td><td id="g_v">-</td></tr>
+        <tr><td>horizontal lines</td><td id="g_h2">-</td></tr>
+      </table>
+      <div class="err" id="g_err"></div>
+    </div>
+  </div>
+  <p class="foot">Exact division and ceiling arithmetic. The size names, the 1.4 cm-per-stitch norm and the dye-lot advice are labeled craft norms - your tension and your frame move the real numbers. <a href="index.html">Why this exists</a></p>
+</div>
+<script src="engine.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const g = id => parseFloat($(id).value);
+function show(id, txt) { const e = $(id); e.textContent = txt; e.style.display = txt ? 'inline-block' : 'none'; }
+document.getElementById('s_go').onclick = () => {
+  $('s_err').textContent = '';
+  try {
+    const r = Flossmath.size(g('s_w'), g('s_h'), g('s_c'), g('s_m'));
+    $('s_out').textContent = r.finishedWIn + ' x ' + r.finishedHIn;
+    show('s_verdict', r.verdict);
+    $('s_cm').textContent = r.finishedWCm + ' x ' + r.finishedHCm;
+    $('s_cut').textContent = r.cutWIn + ' x ' + r.cutHIn;
+    $('s_rows').style.display = 'table';
+  } catch (e) { $('s_err').textContent = e.message; }
+};
+document.getElementById('f_go').onclick = () => {
+  $('f_err').textContent = '';
+  try {
+    const r = Flossmath.floss(g('f_n'), g('f_cm'), g('f_m'), g('f_ss'), g('f_u'));
+    $('f_out').textContent = r.skeins;
+    show('f_verdict', r.verdict);
+    $('f_thread').textContent = r.threadPerSkeinM + ' m';
+    $('f_need').textContent = r.needM + ' m';
+    $('f_rows').style.display = 'table';
+  } catch (e) { $('f_err').textContent = e.message; }
+};
+document.getElementById('g_go').onclick = () => {
+  $('g_err').textContent = '';
+  try {
+    const r = Flossmath.gridlines(g('g_w'), g('g_h'), g('g_n'));
+    $('g_out').textContent = r.total;
+    $('g_v').textContent = r.vertical;
+    $('g_h2').textContent = r.horizontal;
+    $('g_rows').style.display = 'table';
+  } catch (e) { $('g_err').textContent = e.message; }
+};
+</script>
+</body>
+</html>
